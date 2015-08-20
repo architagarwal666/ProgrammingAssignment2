@@ -1,46 +1,40 @@
-#First Part
-#function to create a special "matrix" object
-#that can cache its inverse
 
+#Actual Assignment
+#Learn how to get inverse
 
-makeCacheMatrix <- function(x = matrix()) {
-        inv <- NULL #initialize the inverse as NULL
-        set <- function(y) {   #function to cache the matrix
+mat1 <- matrix(c(2,3,5,1,7,8,2,5,1),nrow = 3, ncol =3)
+mat2 <- matrix(c(2,3,1,1,7,8,2,5,1),nrow = 3, ncol =3)
+
+inv_mat1 <- solve(mat1)
+
+makematrix <- function(x = matrix()) {
+        inv <- NULL
+        set <- function(y) {
                 x <<- y
-                inv <<- NULL
+                inv <<- solve(y)
         }
-        get <- function() x    #function to retrieve the value of the matrix
-        setinv <- function(inverse) inv <<- inverse    #function to cache the inverse of matrix
-        getinv <- function() inv    #function to retrieve the value of the inverse of matrix
+        get <- function() x
+        setinv <- function(inverse) inv <<- inverse
+        getinv <- function() inv
         list(set = set, get = get,
              setinv = setinv,
              getinv = getinv)
 }
 
+z<-makematrix(mat1)
 
 
-z<-makeCacheMatrix(mat1)
-
-#Second Part
-#function to computes the inverse of the special "matrix" 
-#returned by `makeCacheMatrix`
-
-cacheSolve <- function(x, z) {
-        data <- z$get() #Get the old matrix
-        inv <- z$getinv()  #Get inverse of the old matrix
-        if(all(x == data) && !is.null(inv)) {  #Check if matrix has changed and inverse has been calculated or not
-                message("getting cached data") #If the inverse was calculated then retrieve it
-                return(inv) #return the cache inverse, since the old and new matrix are same
+cachematrix <- function(x,newmatrix=matrix()) {
+        data <- x$get()
+        inv <- x$getinv()
+        if(all(newmatrix == data) && !is.null(inv)) {
+                message("getting cached data")
+                return(inv)
         }
         
-        if(is.null(inv)){ #check if inverse of the old matrix has been calculated or not
-                inv <- solve(data) #If the inverse has not been calculated, then calculate the inverse
-                z$setinv(inv) #set the inverse
-                inv
-        } else {  #If the inverse of old has been calculated, then calculate the inverse of new
-                inv2 <- solve(x) #return the inverse of new
-                return(inv2)
-        }
+        inv <- solve(data)
+        x$setinv(inv)
+        inv
 }
 
-cacheSolve(mat1,z)
+cachematrix(z,mat2)
